@@ -1,0 +1,140 @@
+<html>
+<head>
+<title>MainActivity.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: #999999; font-weight: normal; font-style: normal; }
+.s0 { color: rgb(0,0,128); font-weight: bold; }
+.s1 { color: rgb(0,0,0); }
+.s2 { color: rgb(128,128,128); font-style: italic; }
+.s3 { color: rgb(0,0,255); }
+.s4 { color: rgb(128,128,128); font-weight: bold; font-style: italic; }
+.s5 { color: rgb(0,128,0); font-weight: bold; }
+</style>
+</head>
+<BODY BGCOLOR="#ffffff">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+MainActivity.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<a name="l1"><span class="ln">1    </span></a><span class="s0">package </span><span class="s1">fr.upec.elarbi.wifibygps_iut; 
+<a name="l2"><span class="ln">2    </span></a> 
+<a name="l3"><span class="ln">3    </span></a></span><span class="s0">import </span><span class="s1">android.content.BroadcastReceiver; 
+<a name="l4"><span class="ln">4    </span></a></span><span class="s0">import </span><span class="s1">android.content.Context; 
+<a name="l5"><span class="ln">5    </span></a></span><span class="s0">import </span><span class="s1">android.content.Intent; 
+<a name="l6"><span class="ln">6    </span></a></span><span class="s0">import </span><span class="s1">android.content.IntentFilter; 
+<a name="l7"><span class="ln">7    </span></a></span><span class="s0">import </span><span class="s1">android.net.wifi.ScanResult; 
+<a name="l8"><span class="ln">8    </span></a></span><span class="s0">import </span><span class="s1">android.net.wifi.WifiManager; 
+<a name="l9"><span class="ln">9    </span></a></span><span class="s0">import </span><span class="s1">android.support.v7.app.AppCompatActivity; 
+<a name="l10"><span class="ln">10   </span></a></span><span class="s0">import </span><span class="s1">android.os.Bundle; 
+<a name="l11"><span class="ln">11   </span></a></span><span class="s0">import </span><span class="s1">android.util.Log; 
+<a name="l12"><span class="ln">12   </span></a></span><span class="s0">import </span><span class="s1">android.view.MotionEvent; 
+<a name="l13"><span class="ln">13   </span></a></span><span class="s0">import </span><span class="s1">android.view.View; 
+<a name="l14"><span class="ln">14   </span></a></span><span class="s0">import </span><span class="s1">android.widget.ImageView; 
+<a name="l15"><span class="ln">15   </span></a></span><span class="s0">import </span><span class="s1">android.widget.TextView; 
+<a name="l16"><span class="ln">16   </span></a> 
+<a name="l17"><span class="ln">17   </span></a></span><span class="s0">import </span><span class="s1">java.text.DecimalFormat; 
+<a name="l18"><span class="ln">18   </span></a></span><span class="s0">import </span><span class="s1">java.util.List; 
+<a name="l19"><span class="ln">19   </span></a> 
+<a name="l20"><span class="ln">20   </span></a></span><span class="s0">public class </span><span class="s1">MainActivity </span><span class="s0">extends </span><span class="s1">AppCompatActivity { 
+<a name="l21"><span class="ln">21   </span></a> 
+<a name="l22"><span class="ln">22   </span></a> 
+<a name="l23"><span class="ln">23   </span></a>    </span><span class="s2">//List&lt;Mesure&gt;lm;</span><span class="s1"> 
+<a name="l24"><span class="ln">24   </span></a>    </span><span class="s2">//String storemac;</span><span class="s1"> 
+<a name="l25"><span class="ln">25   </span></a>    </span><span class="s0">int</span><span class="s1">[] viewCoords = </span><span class="s0">new int</span><span class="s1">[</span><span class="s3">2</span><span class="s1">]; 
+<a name="l26"><span class="ln">26   </span></a>    ImageView image; 
+<a name="l27"><span class="ln">27   </span></a>    TextView texte; 
+<a name="l28"><span class="ln">28   </span></a>    String valeurs; 
+<a name="l29"><span class="ln">29   </span></a> 
+<a name="l30"><span class="ln">30   </span></a>    </span><span class="s2">/** 
+<a name="l31"><span class="ln">31   </span></a>     * Cette fonction permet de calculer la distance entre notre téléphone et le point d'accès wifi 
+<a name="l32"><span class="ln">32   </span></a>     * </span><span class="s4">@param </span><span class="s2">levelInDb Puissance du signal reçu 
+<a name="l33"><span class="ln">33   </span></a>     * </span><span class="s4">@param </span><span class="s2">freqInMHz Fréquence du signal reçu 
+<a name="l34"><span class="ln">34   </span></a>     * </span><span class="s4">@return </span><span class="s2">retourne la distance 
+<a name="l35"><span class="ln">35   </span></a>     */</span><span class="s1"> 
+<a name="l36"><span class="ln">36   </span></a>    </span><span class="s0">public double </span><span class="s1">calculateDistance(</span><span class="s0">double </span><span class="s1">levelInDb, </span><span class="s0">double </span><span class="s1">freqInMHz)    { 
+<a name="l37"><span class="ln">37   </span></a>        </span><span class="s0">double </span><span class="s1">exp = (</span><span class="s3">27.55 </span><span class="s1">- (</span><span class="s3">20 </span><span class="s1">* Math.log10(freqInMHz)) + Math.abs(levelInDb)) / </span><span class="s3">20.0</span><span class="s1">; 
+<a name="l38"><span class="ln">38   </span></a>        </span><span class="s0">return </span><span class="s1">Math.pow(</span><span class="s3">10.0</span><span class="s1">, exp); 
+<a name="l39"><span class="ln">39   </span></a>    } 
+<a name="l40"><span class="ln">40   </span></a> 
+<a name="l41"><span class="ln">41   </span></a>    </span><span class="s2">/** 
+<a name="l42"><span class="ln">42   </span></a>     * 
+<a name="l43"><span class="ln">43   </span></a>     * </span><span class="s4">@param </span><span class="s2">savedInstanceState 
+<a name="l44"><span class="ln">44   </span></a>     */</span><span class="s1"> 
+<a name="l45"><span class="ln">45   </span></a>    @Override 
+<a name="l46"><span class="ln">46   </span></a>    </span><span class="s0">protected void </span><span class="s1">onCreate(Bundle savedInstanceState) { 
+<a name="l47"><span class="ln">47   </span></a>        </span><span class="s0">super</span><span class="s1">.onCreate(savedInstanceState); 
+<a name="l48"><span class="ln">48   </span></a>        setContentView(R.layout.activity_main); 
+<a name="l49"><span class="ln">49   </span></a> 
+<a name="l50"><span class="ln">50   </span></a>        image = (ImageView) findViewById(R.id.imageView); 
+<a name="l51"><span class="ln">51   </span></a>        image.getLocationOnScreen(viewCoords); 
+<a name="l52"><span class="ln">52   </span></a>        texte = (TextView) findViewById(R.id.textView); 
+<a name="l53"><span class="ln">53   </span></a> 
+<a name="l54"><span class="ln">54   </span></a>        </span><span class="s2">/** 
+<a name="l55"><span class="ln">55   </span></a>         * Cette fonction permet d'afficher les coordonnées de l'endroit où on touche l'écran, puis de calculer la distance avec le point d'accès 
+<a name="l56"><span class="ln">56   </span></a>         */</span><span class="s1"> 
+<a name="l57"><span class="ln">57   </span></a>        image.setOnTouchListener(</span><span class="s0">new </span><span class="s1">View.OnTouchListener() { 
+<a name="l58"><span class="ln">58   </span></a>        @Override 
+<a name="l59"><span class="ln">59   </span></a>        </span><span class="s0">public boolean </span><span class="s1">onTouch(View v, MotionEvent event) { 
+<a name="l60"><span class="ln">60   </span></a>            </span><span class="s0">int </span><span class="s1">touchX = (</span><span class="s0">int</span><span class="s1">) event.getX(); 
+<a name="l61"><span class="ln">61   </span></a>            </span><span class="s0">int </span><span class="s1">touchY = (</span><span class="s0">int</span><span class="s1">) event.getY(); 
+<a name="l62"><span class="ln">62   </span></a>            </span><span class="s0">final int </span><span class="s1">imageX = touchX - viewCoords[</span><span class="s3">0</span><span class="s1">]; 
+<a name="l63"><span class="ln">63   </span></a>            </span><span class="s0">final int </span><span class="s1">imageY = touchY - viewCoords[</span><span class="s3">1</span><span class="s1">]; 
+<a name="l64"><span class="ln">64   </span></a> 
+<a name="l65"><span class="ln">65   </span></a>            valeurs = </span><span class="s5">&quot;X = &quot; </span><span class="s1">+ imageX + </span><span class="s5">&quot;</span><span class="s0">\n</span><span class="s5">Y = &quot; </span><span class="s1">+ imageY; 
+<a name="l66"><span class="ln">66   </span></a>            texte.setText(valeurs); 
+<a name="l67"><span class="ln">67   </span></a> 
+<a name="l68"><span class="ln">68   </span></a>            </span><span class="s0">final  </span><span class="s1">WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE); 
+<a name="l69"><span class="ln">69   </span></a>            </span><span class="s2">/** 
+<a name="l70"><span class="ln">70   </span></a>             * Cette fonction lance le scan Wifi et permet d'afficher les résultats : adresse mac de la borne, la distance en mètre, le canal... 
+<a name="l71"><span class="ln">71   </span></a>             */</span><span class="s1"> 
+<a name="l72"><span class="ln">72   </span></a>            registerReceiver(</span><span class="s0">new </span><span class="s1">BroadcastReceiver() 
+<a name="l73"><span class="ln">73   </span></a>                { 
+<a name="l74"><span class="ln">74   </span></a>                </span><span class="s0">public void </span><span class="s1">onReceive(Context c, Intent intent) { 
+<a name="l75"><span class="ln">75   </span></a>                    List&lt;ScanResult&gt; results = wifi.getScanResults(); 
+<a name="l76"><span class="ln">76   </span></a> 
+<a name="l77"><span class="ln">77   </span></a>                    </span><span class="s0">int </span><span class="s1">rssi = </span><span class="s3">100</span><span class="s1">; </span><span class="s2">//valeur rssi de test</span><span class="s1"> 
+<a name="l78"><span class="ln">78   </span></a>                    </span><span class="s0">int </span><span class="s1">chan = -</span><span class="s3">1</span><span class="s1">; </span><span class="s2">//valeur de test</span><span class="s1"> 
+<a name="l79"><span class="ln">79   </span></a>                    String mac = </span><span class="s5">&quot;&quot;</span><span class="s1">; 
+<a name="l80"><span class="ln">80   </span></a> 
+<a name="l81"><span class="ln">81   </span></a> 
+<a name="l82"><span class="ln">82   </span></a>                    </span><span class="s0">for </span><span class="s1">(ScanResult s : results) { 
+<a name="l83"><span class="ln">83   </span></a>                        </span><span class="s0">if </span><span class="s1">(s.SSID.equals(</span><span class="s5">&quot;Etudiants-Paris12&quot;</span><span class="s1">) &amp; Math.abs(s.level) &lt; rssi) { 
+<a name="l84"><span class="ln">84   </span></a>                            rssi = Math.abs(s.level); 
+<a name="l85"><span class="ln">85   </span></a>                            mac = s.BSSID; 
+<a name="l86"><span class="ln">86   </span></a>                            chan = s.frequency; 
+<a name="l87"><span class="ln">87   </span></a>                        } 
+<a name="l88"><span class="ln">88   </span></a>                        DecimalFormat df = </span><span class="s0">new </span><span class="s1">DecimalFormat(</span><span class="s5">&quot;#.##&quot;</span><span class="s1">); 
+<a name="l89"><span class="ln">89   </span></a>                        texte.setText(</span><span class="s5">&quot;Etudiants-Paris12 BSSID : &quot; </span><span class="s1">+ mac + </span><span class="s5">&quot;RSSI : &quot; </span><span class="s1">+ rssi + </span><span class="s5">&quot; , Distance : &quot; </span><span class="s1">+ 
+<a name="l90"><span class="ln">90   </span></a>                                df.format(calculateDistance((</span><span class="s0">double</span><span class="s1">) rssi, chan)) + </span><span class="s5">&quot;m   -- &quot; </span><span class="s1">+ </span><span class="s5">&quot;Canal : &quot; </span><span class="s1">+ chan); 
+<a name="l91"><span class="ln">91   </span></a> 
+<a name="l92"><span class="ln">92   </span></a>                        </span><span class="s2">/** 
+<a name="l93"><span class="ln">93   </span></a>                         * A partir de là, je n'ai pas réussi à faire fonctionner mon code... (c'est en cours de test). 
+<a name="l94"><span class="ln">94   </span></a>                         */</span><span class="s1"> 
+<a name="l95"><span class="ln">95   </span></a> 
+<a name="l96"><span class="ln">96   </span></a>                        </span><span class="s2">//if (lm.isEmpty()) {</span><span class="s1"> 
+<a name="l97"><span class="ln">97   </span></a>                            </span><span class="s2">//storemac = mac;</span><span class="s1"> 
+<a name="l98"><span class="ln">98   </span></a>                        </span><span class="s2">//}</span><span class="s1"> 
+<a name="l99"><span class="ln">99   </span></a>                        </span><span class="s2">//if (mac == storemac) {</span><span class="s1"> 
+<a name="l100"><span class="ln">100  </span></a>                            </span><span class="s2">//lm.add(new Mesure(imageX, imageY, calculateDistance(double)rssi))</span><span class="s1"> 
+<a name="l101"><span class="ln">101  </span></a>                        </span><span class="s2">//}</span><span class="s1"> 
+<a name="l102"><span class="ln">102  </span></a> 
+<a name="l103"><span class="ln">103  </span></a>                    </span><span class="s2">//}</span><span class="s1"> 
+<a name="l104"><span class="ln">104  </span></a>                    </span><span class="s2">//if (lm.size() &gt; 2) {</span><span class="s1"> 
+<a name="l105"><span class="ln">105  </span></a>                    } 
+<a name="l106"><span class="ln">106  </span></a>                } 
+<a name="l107"><span class="ln">107  </span></a>            }, </span><span class="s0">new </span><span class="s1">IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)); 
+<a name="l108"><span class="ln">108  </span></a> 
+<a name="l109"><span class="ln">109  </span></a>            wifi.startScan(); 
+<a name="l110"><span class="ln">110  </span></a> 
+<a name="l111"><span class="ln">111  </span></a>            </span><span class="s0">return true</span><span class="s1">; 
+<a name="l112"><span class="ln">112  </span></a>        } 
+<a name="l113"><span class="ln">113  </span></a>    }); 
+<a name="l114"><span class="ln">114  </span></a> 
+<a name="l115"><span class="ln">115  </span></a>    } 
+<a name="l116"><span class="ln">116  </span></a> 
+<a name="l117"><span class="ln">117  </span></a>}</span></pre>
+</body>
+</html>
